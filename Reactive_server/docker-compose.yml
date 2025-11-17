@@ -1,0 +1,57 @@
+services:
+  db_reactive:
+    image: postgres:18
+    hostname: 'database_host1'
+    container_name: db_reactive
+    volumes:
+      - reactive_postgres_data:/var/docker-reactive-db
+    environment:
+      - 'POSTGRES_DB=reactive_database'
+      - 'POSTGRES_PASSWORD=1234'
+      - 'POSTGRES_USER=admin'
+    expose:
+      - '5432'
+    networks:
+        - reactive-app-network
+  db_non_reactive:
+    image: postgres:18
+    hostname: 'database_host2'
+    container_name: db_non_reactive
+    volumes:
+      - non_reactive_postgres_data:/var/docker-non-reactive-db
+    environment:
+      - 'POSTGRES_DB=non_reactive_database'
+      - 'POSTGRES_PASSWORD=1234'
+      - 'POSTGRES_USER=admin'
+    expose:
+      - '5432'
+    networks:
+      - non-reactive-app-network
+  reactive_app:
+    build: .
+    container_name: reactive-app
+    ports:
+      - '127.0.0.1:80:8083'
+    depends_on:
+      - db_reactive
+    networks:
+      - reactive-app-network
+  non_reactive_app:
+    build: ./Non_reactive_server
+    container_name: non-reactive-app
+    ports:
+      - '127.0.0.1:81:8083'
+    depends_on:
+      - db_non_reactive
+    networks:
+      - non-reactive-app-network
+
+volumes:
+  reactive_postgres_data:
+  non_reactive_postgres_data:
+
+networks:
+  reactive-app-network:
+    driver: bridge
+  non-reactive-app-network:
+    driver: bridge

@@ -1,0 +1,15 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: Reactive_server
+  r2dbc:
+    url: r2dbc:postgres://db_reactive/reactive_database
+    username: admin
+    password: 1234
+  flyway:
+    url: jdbc:postgresql://db_reactive:5432/reactive_database
+    locations: classpath:db/migration
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
